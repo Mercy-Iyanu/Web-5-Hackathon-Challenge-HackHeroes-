@@ -1,0 +1,91 @@
+.button{
+    cursor: pointer;
+    padding:  .5rem 4rem;
+    margin: .5rem 0;
+    width: 100%;
+    text-align: center;
+    text-transform: capitalize;
+    color: #9ca3af;
+    /* #9ca3af; */
+    background-color: #d1d5db ;
+    /* //#f8fafc; */
+    border: none;
+}
+
+.button:hover{
+    background-color: #000;
+    color: #fff;
+}
+
+.button-file{
+    cursor: pointer;
+    display: block;
+    padding:  .5rem 4rem;
+    margin: 3rem 0;
+    width: 100%;
+    text-align: center;
+    text-transform: capitalize;
+    color: #fff;
+    /* #9ca3af; */
+    background-color: #000 ;
+    /* //#f8fafc; */
+    border: none;
+}
+
+h3{
+    text-align: center;
+
+}
+
+p{
+    text-align: center;
+}
+
+input {
+    padding:  .5rem 4rem;
+    margin: .5rem 0;
+    width: 100%;
+    border: none;
+    text-align: center;
+    background-color: #d1d5db ;
+}
+
+
+  input::placeholder {
+    color: #9ca3af;   
+}
+
+
+
+.section-body{
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+
+.section-user{
+    width: 440px;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+    padding: 50px;
+}
+
+.container{
+    display: flex;
+    justify-content: space-between;
+}
+
+.user{
+    width: 200px;
+    height: 250px;
+    background-color: #f3f4f6;
+}
+
+
+
+
+#file-input {
+    display: none;
+}

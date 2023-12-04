@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Medvacy</title>
+</head>
+<body>
+    <div class="section-body">
+        <div class="section-user">
+            <h3> You are a ? </h3>
+            <div class="container">
+                    <div class="col">
+                        <div class="user"></div>
+                        <p>Patient</p>
+                    </div>
+                    <div class="col">
+                        <div class="user"></div>
+                         <!-- <img src="" alt=""/> -->
+                        
+                        <p>Doctor</p>
+                    </div>
+            </div>
+            <button class="button">process</button>
+        </div>
+   </div>
+
+
+   <div class="section-body">
+        <div class="section-user">
+            <h3> Enter ID </h3>
+            <div class="container">
+                <input type="text" autoFocus placeholder="Enter User ID"/>
+            </div>
+            <button class="button">process</button>
+        </div>
+    </div>
+
+
+    <!-- File upload -->
+    <div class="section-user">
+        <div id="upload-container">
+            <p id="file-name"></p>
+            <input type="file" id="file-input" onchange="handleFileSelect(event)">
+            <label for="file-input" class="button-file">Choose a file</label>
+        </div>
+    </div>
+
+<script>
+
+function handleFileSelect(event) {
+            const fileInput = event.target;
+            const fileNameDisplay = document.getElementById('file-name');
+
+            if (fileInput.files.length > 0) {
+                const fileName = fileInput.files[0].name;
+                fileNameDisplay.textContent = `Selected file: ${fileName}`;
+            } else {
+                fileNameDisplay.textContent = '';
+            }
+        }
+</script>
+</body>
+</html>
