@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App.js';
+import Users from './components/Users.js';
+import SignIn from './components/SignIn.js';
 
 
 // const { web5, did: aliceDid } = await Web5.connect();
@@ -15,7 +17,11 @@ import App from './App.js';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    {/* <App /> */}
+    <Users/>
+
+    <SignIn/>
+    
   </React.StrictMode>
 );
 
