@@ -7,28 +7,45 @@
     <title>Medvacy</title>
 </head>
 <body>
-    <div class="section-body">
+    <nav>
+        <div class="logo">
+            <h1>Madvacy</h1>
+        </div>
+        <div class="nav-buttons">
+            <ul>
+                <li>Dashboard</li>
+                <li>Records</li>
+                <li>Privacy</li>
+                <li>Settings</li>
+            </ul>
+        </div>
+    </nav>
+    <div class="section-body" id="section-1">
         <div class="section-user">
             <h3> You are a ? </h3>
             <div class="container">
                     <div class="col">
-                        <div class="user"></div>
+                        <div class="user">
+                            <img src="./images/petients.png" alt="an illustraton of a petient">
+                        </div>
                         <p>Patient</p>
                     </div>
                     <div class="col">
-                        <div class="user"></div>
+                        <div class="user">
+                            <img src="./images/doc.png" alt="an illustraton of a doctor">
+                        </div>
                          <!-- <img src="" alt=""/> -->
                         
                         <p>Doctor</p>
                     </div>
             </div>
-            <button class="button">process</button>
+            <button class="button" id="pro-section-1">process</button>
         </div>
    </div>
 
 
-   <div class="section-body">
-        <div class="section-user">
+   <div class="section-body"  >
+        <div class="section-user" id="section-2" style="display: none;" >
             <h3> Enter ID </h3>
             <div class="container">
                 <input type="text" autoFocus placeholder="Enter User ID"/>
@@ -40,7 +57,7 @@
 
     <!-- File upload -->
     <div class="section-user">
-        <div id="upload-container">
+        <div id="upload-container" style="display: none;" >
             <p id="file-name"></p>
             <input type="file" id="file-input" onchange="handleFileSelect(event)">
             <label for="file-input" class="button-file">Choose a file</label>
@@ -48,6 +65,15 @@
     </div>
 
 <script>
+
+    document.querySelector("#section-1");
+   let section_1 = document.querySelector("#pro-section-1");
+   let section_2 = document.querySelector("#section-2");
+
+   section_1.addEventListener("click", ()=>{
+        // alert("Hello world!");
+        section_2.style.display = "block";
+   })
 
 function handleFileSelect(event) {
             const fileInput = event.target;
