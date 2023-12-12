@@ -29,352 +29,59 @@
                 <input type="text" id="Udid" autoFocus placeholder="Enter your DID"/>
             </div>
             <div class="container">
-                <div class="add-file">
+                <div class="add-file" id="fileList">
                     <img src="./images/upload.png" alt="image of cloud upload">
                     <p><a href="#"><span style="font-weight: 700;">Click here</span> or drag and drop file here</a></p>
                 </div>
             </div>
-            <button class="button" id="uploadReport">Add Records</button>
+            <input type="file" id="fileElem" multiple  accept="image/*" style="display:none" />
+            <a href="#" id="fileSelect"><button class="button">Add Records</button></a>
         </div>
     </div>
+  
+ 
+    <script>
+        const fileSelect = document.getElementById("fileSelect"),
+  fileElem = document.getElementById("fileElem"),
+  fileList = document.getElementById("fileList");
 
-    <script type="module">
-        const div = document.querySelector('div');
+fileSelect.addEventListener(
+  "click",
+  (e) => {
+    if (fileElem) {
+      fileElem.click();
+    }
+    e.preventDefault(); // prevent navigation to "#"
+  },
+  false,
+);
 
-        // Create a map of button IDs to handler functions
-        const buttonHandlers = new Map([
-        //['queryProtocol', queryProtocol],
-        //['configProtocol', configProtocol],
-        ['uploadReport', uploadReport],
-        //['readBlog', readBlog],
-        //['seeDid', seeDid],
-        //['patient', patient],
-      ]);
+fileElem.addEventListener("change", handleFiles, false);
 
-    //  const patientType = document.querySelector('.patient')
-    //  const docType = document.querySelector('.doctor')
-    //  const userType = document.getElementById('userType')
+function handleFiles() {
+  if (!this.files.length) {
+    fileList.innerHTML = "<p>No files selected!</p>";
+  } else {
+    fileList.innerHTML = "";
+    const list = document.createElement("ul");
+    fileList.appendChild(list);
+    for (let i = 0; i < this.files.length; i++) {
+      const li = document.createElement("li");
+      list.appendChild(li);
 
-    //   patientType.addEventListener('click', async function(){
-    //     userType.value = "Patient"
-    //   })
-
-    //   docType.addEventListener('click', async function(){
-    //     userType.value = "Doctor"
-    //   })
-    // async function patient(){
-    //   console.log("patient");
-    // }
-      
-
-        // Add an event listener to the div element
-        div.addEventListener('click', (event) => {
-        // Get the handler function for the clicked button
-        const handler = buttonHandlers.get(event.target.id);
-
-        // If a handler function was found, call it
-        if (handler) {
-            handler();
-        }
-        });
-
-fileUpload.addEventListener("change", async function(){
-
-
-            const fileInput = event.target;
-            const fileNameDisplay = document.getElementById('file-name');
-
-            if (fileInput.files.length > 0) {
-                const fileName = fileInput.files[0].name;
-                fileNameDisplay.textContent = `Selected file: ${fileName}`;
-
-                const filereader = new FileReader();
-                filereader.readAsArrayBuffer(fileUpload.files[0]);
-                filereader.addEventListener('load', function () {
-                    imageData = filereader.result;
-                })
-
-            } else {
-                fileNameDisplay.textContent = '';
-            }
-        })
-
-
-      
-
-      // Import Web5
-      import { Web5 } from 'https://cdn.jsdelivr.net/npm/@web5/api@0.8.2/dist/browser.mjs';;
-      // Initiate web5 connect
-      const { web5, did: myDid } = await Web5.connect();
-      // variable for uploaded images
-      let imageData;
-      // The protocol to be installed
-      const protocolDefinition = {
-        protocol: 'http://test3',
-        published: true,
-        types: {
-          comments: {
-            dataFormats: ['application/json'],
-          },
-          blogpost: {
-            dataFormats: ['application/json'],
-          },
-          image: {
-            dataFormats: ['image/png', 'image/jpeg'],
-          },
-          video: {
-            dataFormats: ['video/mp4', 'video/webm'],
-          },
-        },
-        structure: {
-          blogpost: {
-            $actions: [
-              {
-                who: 'anyone',
-                can: 'write',
-              },
-              {
-                who: 'anyone',
-                can: 'read',
-              },
-            ],
-            comments: {
-              $actions: [
-                {
-                  who: 'anyone',
-                  can: 'write',
-                },
-                {
-                  who: 'anyone',
-                  can: 'read',
-                },
-              ],
-            },
-            image: {
-              $actions: [
-                {
-                  who: 'author',
-                  of: 'blogpost',
-                  can: 'write',
-                },
-                {
-                  who: 'anyone',
-                  can: 'read',
-                },
-              ],
-            },
-            video: {
-              $actions: [
-                {
-                  who: 'author',
-                  of: 'blogpost',
-                  can: 'write',
-                },
-                {
-                  who: 'anyone',
-                  can: 'read',
-                },
-              ],
-            },
-          },
-        },
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(this.files[i]);
+      img.height = 60;
+      img.onload = () => {
+        URL.revokeObjectURL(img.src);
       };
-
-
-
-      //install protocol
-      async function configProtocol() {
-        const { protocol, status } = await web5.dwn.protocols.configure({  
-          message: {
-            definition: protocolDefinition,
-          },
-        });
-        protocol.send(myDid);
-        console.log(status);
-        document.getElementById('configProtocolInfo').innerHTML =
-          JSON.stringify(status);
-      }
-
-      //doublecheck it is installed
-      async function queryProtocol() {
-        const { protocols } = await web5.dwn.protocols.query({
-          message: {
-            filter: {
-              protocol: 'test3',
-            },
-          },
-        });
-        console.log(protocols);
-        document.getElementById('queryProtocolInfo').innerHTML =
-          'Installed protocol: ' +
-          JSON.stringify(protocols[0].definition.protocol);
-      }
-
-      //Check what your DID is
-      async function seeDid() {
-        document.getElementById('seeDidInfo').innerHTML = myDid;
-      }
-
-
-      //function to write an image file if needed
-      async function imageWrite(imageDataFile, contextId) {
-        const imageblob = new Blob([imageDataFile], { type: 'image/jpeg' });
-
-        const { record: imagerecord } = await web5.dwn.records.create({
-          data: imageblob,
-          store: false,
-          message: {
-            schema: 'image',
-            dataFormat: 'image/jpeg',
-            protocol: protocolDefinition.protocol,
-            protocolPath: 'blogpost/image',
-            parentId: contextId,
-            contextId: contextId,
-            published: true,
-          },
-        });
-        const { status: imagestatus } = await imagerecord.send(myDid);
-        console.log(imagestatus);
-        document.getElementById('publishBlogpostInfo').innerHTML +=
-          'Image upload:   ' + imagestatus.detail;
-
-          
-      }
-      
-      //publish blog
-      async function uploadReport() {
-        //get values for user
-        //let uType = userType.value;
-        let userId = document.getElementById('Udid').value;
-        let jsonData = {
-          userId: userId,
-        };
-
-        //write the initial user record with the application/json data
-        const { record: initialrecord } = await web5.dwn.records.create({
-          data: jsonData,
-          store: false,
-          message: {
-            schema: 'blogpost',
-            dataFormat: 'application/json',
-            protocol: 'http://test3',
-            protocolPath: 'blogpost',
-            published: true,
-          },
-        });
-        const { status: initialstatus } = await initialrecord.send(myDid);
-        console.log(initialstatus);
-        document.getElementById('publishBlogpostInfo').innerHTML =
-          'Status:   ' + initialstatus.detail;
-        const conId = initialrecord.id;
-
-        if (imageData) {
-          await imageWrite(imageData, conId);
-        }
-        //reset input fields
-        document.getElementById('userType').value = '';
-        document.getElementById('userId').value = '';
-        //document.getElementById('articlebody').value = '';
-      }
-
-
-//Display a blog once a DID has been entered
-async function readBlog() {
-        document.getElementById('blogresult').innerHTML = '';
-        const blogDid = document.getElementById('enterDid').value;
-
-        //get blogposts
-        const { records: blogpostrecords } = await web5.dwn.records.query({
-          from: blogDid,
-          message: {
-            filter: {
-              protocol: 'http://test3',
-              protocolPath: 'blogpost',
-            },
-          },
-        });
-        console.log('blog post records', blogpostrecords)
-
-        //get images
-        const { records: imagerecords } = await web5.dwn.records.query({
-          from: blogDid,
-          message: {
-            filter: {
-              protocol: 'http://test3',
-              protocolPath: 'blogpost/image',
-            },
-          },
-        });
-        console.log('image records', imagerecords);
-
-        const blogPostIds = [];
-
-        Promise.all(
-          blogpostrecords.map((element) => {
-            console.log('this is the element', element);
-            blogPostIds.push(element.id);
-
-            return element.data.json();
-          })
-        ).then((resolvedBlogContents) => {
-          resolvedBlogContents.forEach((blogContent, index) => {
-            // Create a new div element for each blog post.
-            const blogDiv = document.createElement('div');
-
-            blogDiv.classList.add('blog-div');
-            //retrieve any image uploaded for this blogpost
-            
-            imagerecords.forEach(async (element) => {
-              console.log('this is the element for images', element);
-              // Get the blob of the image data
-              const imageId = element.id
-              console.log(imageId)
-               const {record, status }= await web5.dwn.records.read({
-                from: blogDid,
-                message: {
-                   filter: {
-                    recordId: imageId,
-                   },
-                  // protocol: 'http://test3',
-                  // protocolPath: 'blogpost/image',
-                },
-                });
-              console.log ({record, status})
-              const imageresult = await record.data.blob();
-     
-              const imageid = await element.contextId;
-              if (imageid === blogPostIds[index]) {
-                // Create a new img element for the image
-                const img = document.createElement('img');
-
-                // Create a URL for the image
-                const imageUrl = URL.createObjectURL(imageresult);
-
-                // Set the src attribute of the img element to the URL
-                img.src = imageUrl;
-
-                // Append the img element to the container element
-                blogDiv.appendChild(img);
-              }
-            });
-
-            // Set the innerHTML of the div element to the Report content.
-    //         blogDiv.innerHTML = `
-    //     <p id="display">
-    //        <span class="blog-headline"> 
-    //       ${blogContent.uType}
-    //       <br />
-    //         <span class="blog-description">
-    //       ${blogContent.userId}
-          
-    //     </p>
-    //   `;
-
-            // Append the div element to the blogresult element.
-            document.getElementById('blogresult').appendChild(blogDiv);
-          });
-        });
-      }
-</script>
+      li.appendChild(img);
+      const info = document.createElement("span");
+      info.innerHTML = `${this.files[i].name}: ${this.files[i].size} bytes`;
+      li.appendChild(info);
+    }
+  }
+}
+    </script>
 </body>
 </html>
