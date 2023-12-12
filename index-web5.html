@@ -4,41 +4,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Dashboard</title>
+    <title>Medvacy</title>
+    <style>
+      nav{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 3rem;
+    box-shadow: 0 .1px 3px 1px #000 ;
+}
+
+.nav-buttons ul{
+    list-style: none;
+    display: flex;
+}
+
+.nav-buttons ul li{
+    padding: 0 0 0 2rem ;
+    cursor: pointer;
+}
+
+a{
+    text-decoration: none;
+    color: #000;
+}
+
+.nav-buttons ul li:hover{
+   font-weight: 600;
+}
+
+    </style>
 </head>
 <body>
+  <nav>
+    <div class="logo">
+        <h1><a href="./index.html">Madvacy</a></h1>
+    </div>
+    <div class="nav-buttons">
+        <ul>
+            <li><a href="./dashboard.html">Dashboard</a></li>
+            <li>Records</li>
+            <li>Privacy</li>
+            <li>Settings</li>
+        </ul>
+    </div>
+</nav>
+  <div>
 
-    <nav>
-        <div class="logo">
-            <h1><a href="./index.html">Madvacy</a></h1>
-        </div>
-        <div class="nav-buttons">
-            <ul>
-                <li><a href="./dashboard.html">Dashboard</a></li>
-                <li>Records</li>
-                <li>Privacy</li>
-                <li>Settings</li>
-            </ul>
-        </div>
-    </nav>
-
-    <div class="section-body"  >
+   <div class="section-body">
         <div class="section-user">
-            <h3> User Dashboard </h3>
+            <h3> Enter ID </h3>
             <div class="container">
-                <input type="text" id="Udid" autoFocus placeholder="Enter your DID"/>
+                <input type="text" id="userId" autoFocus placeholder="Enter User ID"/>
             </div>
-            <div class="container">
-                <div class="add-file" id="fileList">
-                    <img src="./images/upload.png" alt="image of cloud upload">
-                    <p id="file-name"><a href="#"><span style="font-weight: 700;" id="fileSelect">Click here</span> or drag and drop file here</a></p>
-                </div>
-            </div>
-            <input type="file" id="fileUpload" multiple  accept="image/*" style="display:none" />
-            <button class="button" id="uploadReport">Add Records</button>
+            <div id="upload-container">
+              <p id="file-name"></p>
+              <input type="file" id="fileUpload">
+              <label for="fileUpload" class="button-file">Choose a file</label>
+          </div>
+          
+    <button id="uploadReport" style="cursor: pointer;
+    display: block;
+    padding:  .5rem;
+    width: 30%;
+    text-align: center;
+    text-transform: capitalize;
+    color: #fff;
+    background-color: #20A93D ;
+    border: none;">Upload</button>
         </div>
     </div>
 
+ </div>
+    <!-- File upload -->
+<!--    
+    <div class="section-user">
+      <input type="hidden" id="userType">
+         -->
+    </div>
+    
     <script type="module">
         const div = document.querySelector('div');
 
@@ -47,7 +91,7 @@
         ['queryProtocol', queryProtocol],
         ['configProtocol', configProtocol],
         ['uploadReport', uploadReport],
-        ['readBlog', readBlog],
+        // ['readBlog', readBlog],
         ['seeDid', seeDid],
         //['patient', patient],
       ]);
@@ -234,12 +278,11 @@ fileUpload.addEventListener("change", async function(){
       
       //publish blog
       async function uploadReport() {
-        alert()
+        //alert()
         //get values for blogpost
-        let uType = userType.value;
+        //let uType = userType.value;
         let userId = document.getElementById('userId').value;
         let jsonData = {
-          uType: uType,
           userId: userId,
         };
 
@@ -265,109 +308,10 @@ fileUpload.addEventListener("change", async function(){
           await imageWrite(imageData, conId);
         }
         //reset input fields
-        document.getElementById('userType').value = '';
         document.getElementById('userId').value = '';
         //document.getElementById('articlebody').value = '';
       }
 
-
-//Display a blog once a DID has been entered
-async function readBlog() {
-        document.getElementById('blogresult').innerHTML = '';
-        const blogDid = document.getElementById('enterDid').value;
-
-        //get blogposts
-        const { records: blogpostrecords } = await web5.dwn.records.query({
-          from: blogDid,
-          message: {
-            filter: {
-              protocol: 'http://test3',
-              protocolPath: 'blogpost',
-            },
-          },
-        });
-        console.log('blog post records', blogpostrecords)
-
-        //get images
-        const { records: imagerecords } = await web5.dwn.records.query({
-          from: blogDid,
-          message: {
-            filter: {
-              protocol: 'http://test3',
-              protocolPath: 'blogpost/image',
-            },
-          },
-        });
-        console.log('image records', imagerecords);
-
-        const blogPostIds = [];
-
-        Promise.all(
-          blogpostrecords.map((element) => {
-            console.log('this is the element', element);
-            blogPostIds.push(element.id);
-
-            return element.data.json();
-          })
-        ).then((resolvedBlogContents) => {
-          resolvedBlogContents.forEach((blogContent, index) => {
-            // Create a new div element for each blog post.
-            const blogDiv = document.createElement('div');
-
-            blogDiv.classList.add('blog-div');
-            //retrieve any image uploaded for this blogpost
-            
-            imagerecords.forEach(async (element) => {
-              console.log('this is the element for images', element);
-              // Get the blob of the image data
-              const imageId = element.id
-              console.log(imageId)
-               const {record, status }= await web5.dwn.records.read({
-                from: blogDid,
-                message: {
-                   filter: {
-                    recordId: imageId,
-                   },
-                  // protocol: 'http://test3',
-                  // protocolPath: 'blogpost/image',
-                },
-                });
-              console.log ({record, status})
-              const imageresult = await record.data.blob();
-     
-              const imageid = await element.contextId;
-              if (imageid === blogPostIds[index]) {
-                // Create a new img element for the image
-                const img = document.createElement('img');
-
-                // Create a URL for the image
-                const imageUrl = URL.createObjectURL(imageresult);
-
-                // Set the src attribute of the img element to the URL
-                img.src = imageUrl;
-
-                // Append the img element to the container element
-                blogDiv.appendChild(img);
-              }
-            });
-
-            // Set the innerHTML of the div element to the blog post content.
-            blogDiv.innerHTML = `
-        <p id="display">
-           <span class="blog-headline"> 
-          ${blogContent.uType}
-          <br />
-            <span class="blog-description">
-          ${blogContent.userId}
-          
-        </p>
-      `;
-
-            // Append the div element to the blogresult element.
-            document.getElementById('blogresult').appendChild(blogDiv);
-          });
-        });
-      }
 </script>
 </body>
 </html>
