@@ -36,6 +36,7 @@ a{
     </style>
 </head>
 <body>
+  <div>
   <nav>
     <div class="logo">
         <h1><a href="./index.html">Madvacy</a></h1>
@@ -49,17 +50,27 @@ a{
         </ul>
     </div>
 </nav>
-  <div>
 
    <div class="section-body">
+    <div style="display: none;">
+      Configure protocol<br />
+      <button id="configProtocol">Protocol config</button>
+      <p id="configProtocolInfo"></p>
+    </div>
+    <div style=" display: none;">
+      Check to see if test protocol is configured<br />
+      <button id="queryProtocol">Protocol query</button>
+      <p id="queryProtocolInfo"></p>
+    </div>
         <div class="section-user">
-            <h3> Enter ID </h3>
+            <h3> Enter DID </h3>
             <div class="container">
-                <input type="text" id="userId" autoFocus placeholder="Enter User ID"/>
+                <input type="text" id="userId" autoFocus placeholder="Enter User DID"/>
+                <!-- <button id="seeDid">See ID</button> -->
             </div>
             <div id="upload-container">
               <p id="file-name"></p>
-              <input type="file" id="fileUpload">
+              <input type="file" id="fileUpload" style="display: none;">
               <label for="fileUpload" class="button-file">Choose a file</label>
           </div>
           
@@ -75,70 +86,60 @@ a{
         </div>
     </div>
 
- </div>
     <!-- File upload -->
 <!--    
     <div class="section-user">
       <input type="hidden" id="userType">
          -->
     </div>
-    
+  </div>
     <script type="module">
-        const div = document.querySelector('div');
+      const div = document.querySelector('div');
 
-        // Create a map of button IDs to handler functions
-        const buttonHandlers = new Map([
+      // Create a map of button IDs to handler functions
+      const buttonHandlers = new Map([
         ['queryProtocol', queryProtocol],
         ['configProtocol', configProtocol],
         ['uploadReport', uploadReport],
-        // ['readBlog', readBlog],
         ['seeDid', seeDid],
-        //['patient', patient],
       ]);
 
-     
-    // async function patient(){
-    //   console.log("patient");
-    // }
-      
-
-        // Add an event listener to the div element
-        div.addEventListener('click', (event) => {
+      // Add an event listener to the div element
+      div.addEventListener('click', (event) => {
         // Get the handler function for the clicked button
         const handler = buttonHandlers.get(event.target.id);
 
         // If a handler function was found, call it
         if (handler) {
-            handler();
+          handler();
         }
-        });
-
-fileUpload.addEventListener("change", async function(){
-
-
-            const fileInput = event.target;
-            const fileNameDisplay = document.getElementById('file-name');
-
-            if (fileInput.files.length > 0) {
-                const fileName = fileInput.files[0].name;
-                fileNameDisplay.textContent = `Selected file: ${fileName}`;
-
-                const filereader = new FileReader();
-                filereader.readAsArrayBuffer(fileUpload.files[0]);
-                filereader.addEventListener('load', function () {
-                    imageData = filereader.result;
-                })
-
-            } else {
-                fileNameDisplay.textContent = '';
-            }
-        })
-
-
+      });
       
 
+      fileUpload.addEventListener("change", async function(){
+
+
+        const fileInput = event.target;
+        const fileNameDisplay = document.getElementById('file-name');
+
+        if (fileInput.files.length > 0) {
+            const fileName = fileInput.files[0].name;
+            fileNameDisplay.textContent = `Selected file: ${fileName}`;
+
+            const filereader = new FileReader();
+            filereader.readAsArrayBuffer(fileUpload.files[0]);
+            filereader.addEventListener('load', function () {
+                imageData = filereader.result;
+            })
+
+        } else {
+            fileNameDisplay.textContent = '';
+        }
+        })
+              
+
       // Import Web5
-      import { Web5 } from 'https://cdn.jsdelivr.net/npm/@web5/api@0.8.2/dist/browser.mjs';;
+      import { Web5 } from 'https://cdn.jsdelivr.net/npm/@web5/api@0.8.3/dist/browser.mjs';
       // Initiate web5 connect
       const { web5, did: myDid } = await Web5.connect();
       // variable for uploaded images
@@ -215,8 +216,6 @@ fileUpload.addEventListener("change", async function(){
         },
       };
 
-
-
       //install protocol
       async function configProtocol() {
         const { protocol, status } = await web5.dwn.protocols.configure({  
@@ -259,9 +258,9 @@ fileUpload.addEventListener("change", async function(){
           data: imageblob,
           store: false,
           message: {
-            schema: 'image',
+            schema: 'blogpost',
             dataFormat: 'image/jpeg',
-            protocol: protocolDefinition.protocol,
+            protocol: 'test3',
             protocolPath: 'blogpost/image',
             parentId: contextId,
             contextId: contextId,
@@ -270,25 +269,21 @@ fileUpload.addEventListener("change", async function(){
         });
         const { status: imagestatus } = await imagerecord.send(myDid);
         console.log(imagestatus);
-        document.getElementById('publishBlogpostInfo').innerHTML +=
-          'Image upload:   ' + imagestatus.detail;
-
-          
+        alert("Medical Report Uploaded Successfully!!!");
+        
       }
-      
+
       //publish blog
       async function uploadReport() {
-        //alert()
+        document.getElementById('configProtocol').click();
+        document.getElementById('queryProtocol').click();
         //get values for blogpost
-        //let uType = userType.value;
         let userId = document.getElementById('userId').value;
-        let jsonData = {
-          userId: userId,
-        };
+        
 
         //write the initial blogpost record with the application/json data
         const { record: initialrecord } = await web5.dwn.records.create({
-          data: jsonData,
+          data: userId,
           store: false,
           message: {
             schema: 'blogpost',
@@ -300,8 +295,7 @@ fileUpload.addEventListener("change", async function(){
         });
         const { status: initialstatus } = await initialrecord.send(myDid);
         console.log(initialstatus);
-        document.getElementById('publishBlogpostInfo').innerHTML =
-          'Status:   ' + initialstatus.detail;
+        
         const conId = initialrecord.id;
 
         if (imageData) {
@@ -309,9 +303,9 @@ fileUpload.addEventListener("change", async function(){
         }
         //reset input fields
         document.getElementById('userId').value = '';
-        //document.getElementById('articlebody').value = '';
       }
 
-</script>
+      
+    </script>
 </body>
 </html>
